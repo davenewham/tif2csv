@@ -4,17 +4,17 @@ import os, random, string
 from bottle import route, run, static_file, request
 
 #Landing page
-@route('/app/tif2csv')
+@route('/gis/tif2csv')
 def hello():
     return static_file("index.html", root=os.path.curdir)
 
 
-@route('/app/tif2csv/<filename>')
+@route('/gis/tif2csv/<filename>')
 def hello(filename="index.html"):
     return static_file(filename, root=os.path.curdir)
 
 #The code for the app
-@route('/app/upload', method = 'POST')
+@route('/gis/tif2csv', method = 'POST')
 def do_upload():
     category = request.forms.get('category')
     upload = request.files.get('fileToUpload')

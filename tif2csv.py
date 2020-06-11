@@ -9,6 +9,8 @@
 # This code is heavily based on Frank Warmerdam's gdal2xyz.py with only
 # a few changes.
 #
+# TODO: remove dependence on gdal.
+#
 ###############################################################################
 # copyright (c) 2002, frank warmerdam <warmerdam@pobox.com>
 #
