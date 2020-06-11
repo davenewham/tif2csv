@@ -30,12 +30,20 @@ def do_upload():
             break
     name, ext = os.path.splitext(UrlToDownload)
     name = name.split("/")[-1]
-
-    #Download large file safely
+    if not ext == ".zip":
+        raise bottle.HTTPerror(500, "File was not a zip.")
+    # Download large file safely
     wget.download(UrlToDownload, out=dirname+"/")
     filename = UrlToDownload.split("/")[-1]
 
+    # Check that this file isn't too big (30MB)
+    if (os.stat(dirname + "/" + filename).st_size >> 20)>30:
+        raise bottle.HTTPerror(500, "File too large")
+
     os.system("unzip " + dirname + "/" + filename + ' "*.tif"  -d '  + dirname)
+    
+
+
 
     files = glob.glob(dirname + "/*.tif")
 
