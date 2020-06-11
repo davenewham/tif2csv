@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 
 import wget, glob, os, random, string, requests
-from bottle import response, route, run, static_file, request
+from bottle import response, route, run, static_file, request, abort
 
 #Landing page
 @route('/gis/tif2csv')
@@ -32,7 +32,18 @@ def do_upload():
     name = name.split("/")[-1]
 
     #Download large file safely
+    r = requests.head(UrlToDownload)
+
+    if r.status_code != 200:
+        abort(500, "Could not find linked file!")
+
+    file_size = int(float(r.headers['Content-Length']))
+
+    if file_size is None or (file_size >> 20) > 30:
+        abort(500, "Linked file is too large")
+
     wget.download(UrlToDownload, out=dirname+"/")
+
     filename = UrlToDownload.split("/")[-1]
 
     os.system("unzip " + dirname + "/" + filename + ' "*.tif"  -d '  + dirname)
@@ -40,7 +51,7 @@ def do_upload():
     files = glob.glob(dirname + "/*.tif")
 
     if len(files) == 0:
-        raise bottle.HTTPerror(500, "Couldn't locate file")
+        raise abort(500, "Couldn't locate file")
 
     filename = files[0]
 
@@ -83,4 +94,4 @@ def do_upload():
 
     return  static_file(asc_filename, root=dirname, download=asc_filename)
 
-run(host='localhost', port = 8080, debug = True)
+run(host='localhost', port = 8080)
