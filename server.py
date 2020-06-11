@@ -35,7 +35,7 @@ def do_upload():
     wget.download(UrlToDownload, out=dirname+"/")
     filename = UrlToDownload.split("/")[-1]
 
-    os.system("unzip " + dirname + "/" + name + ' "*.tif"  -d '  + dirname)
+    os.system("unzip " + dirname + "/" + filename + ' "*.tif"  -d '  + dirname)
 
     files = glob.glob(dirname + "/*.tif")
 
