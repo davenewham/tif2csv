@@ -9,7 +9,7 @@ this file format. In it's place they're using must more useful and nicer GeoTIF 
 sorts of useful metadata for use in GIS software (e.g ArcGIS, QGIS). 
 
 Unfortunately, a number of my scripts (regretfully named 'csv-tools' and not 'gridr') required these files to do their magic (very very slowly in the case of plotting
-contour lines). These scripts are designed to download GeoTIF files from the EA's [environment.data.gov.uk] and convert them to
+contour lines). These scripts are designed to download GeoTIF files from the EA's [website](https://environment.data.gov.uk) and convert them to
 the archaic, familiar format. Another benefit of this format is that for a lot of purposes where a few individual spot levels are 
 needed, there's no longer a need for someone to download and become familiar with GIS software.
 
