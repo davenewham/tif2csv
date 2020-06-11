@@ -41,12 +41,9 @@ def do_upload():
         raise bottle.HTTPerror(500, "File too large")
 
     os.system("unzip " + dirname + "/" + filename + ' "*.tif"  -d '  + dirname)
-    
-
-
 
     files = glob.glob(dirname + "/*.tif")
-
+    tif_filename = files[0].split("/")[-1]
     if len(files) == 0:
         raise bottle.HTTPerror(500, "Couldn't locate file")
 
@@ -84,7 +81,7 @@ def do_upload():
     height = str(height)
 
     asc_filename = filename[:-3] + "asc"
-    os.system("./tif2csv.py " + dirname + "/" + filename + " -srcwin " +
+    os.system("./tif2csv.py " + dirname + "/" + tif_filename + " -srcwin " +
               xll + " " + yll + " " + width + " " + height + " >> " + dirname + "/" + asc_filename)
 
     return  static_file(asc_filename, root=dirname, download=asc_filename)
