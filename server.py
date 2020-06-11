@@ -37,10 +37,10 @@ def do_upload():
 
     os.system("unzip " + dirname + "/" + name + ' "*.tif"  -d '  + dirname)
 
-    files = glob.glob("*.tif")
+    files = glob.glob(dirname + "/*.tif")
 
     if len(files) == 0:
-        raise bottle.HTTPerror(500, "Coudln't locate file")
+        raise bottle.HTTPerror(500, "Couldn't locate file")
 
     filename = files[0]
 
