@@ -42,8 +42,6 @@ def do_upload():
     if len(files) == 0:
         raise bottle.HTTPerror(500, "Couldn't locate file")
 
-    filename = files[0]
-
     xll = request.forms.get('xllcorner')
     yll = request.forms.get('yllcorner')
     width = request.forms.get('width')
