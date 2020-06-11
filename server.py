@@ -31,6 +31,10 @@ def do_upload():
     name, ext = os.path.splitext(UrlToDownload)
     name = name.split("/")[-1]
 
+    #Check we have the right file extension
+
+    if not ext == ".zip":
+        raise bottle.HTTPerror(500, "File was not a zip.")
     #Download large file safely
     r = requests.head(UrlToDownload)
 
@@ -41,19 +45,21 @@ def do_upload():
 
     if file_size is None or (file_size >> 20) > 30:
         abort(500, "Linked file is too large")
-
+    # Download large file safely
     wget.download(UrlToDownload, out=dirname+"/")
 
     filename = UrlToDownload.split("/")[-1]
 
+    # Check that this file isn't too big (30MB)
+    if (os.stat(dirname + "/" + filename).st_size >> 20)>30:
+        raise bottle.HTTPerror(500, "File too large")
+
     os.system("unzip " + dirname + "/" + filename + ' "*.tif"  -d '  + dirname)
 
     files = glob.glob(dirname + "/*.tif")
-
+    tif_filename = files[0].split("/")[-1]
     if len(files) == 0:
         raise abort(500, "Couldn't locate file")
-
-    filename = files[0]
 
     xll = request.forms.get('xllcorner')
     yll = request.forms.get('yllcorner')
@@ -89,7 +95,7 @@ def do_upload():
     height = str(height)
 
     asc_filename = filename[:-3] + "asc"
-    os.system("./tif2csv.py " + dirname + "/" + filename + " -srcwin " +
+    os.system("./tif2csv.py " + dirname + "/" + tif_filename + " -srcwin " +
               xll + " " + yll + " " + width + " " + height + " >> " + dirname + "/" + asc_filename)
 
     return  static_file(asc_filename, root=dirname, download=asc_filename)
