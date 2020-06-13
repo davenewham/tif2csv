@@ -149,17 +149,17 @@ if __name__ == '__main__':
 
     #header data
     ncols = int(srcwin[3] / skip)
-    dst_fh.write( "ncols " + str(ncols) +"\n")
+    dst_fh.write("ncols        " + str(ncols) +"\r\n")
     nrows = srcwin[2] / skip
-    dst_fh.write("nrows " + str(nrows) + "\n")
+    dst_fh.write("nrows        " + str(nrows) + "\r\n")
     #coordinates of lower-lefthand corner
     xllcorner = int(srcwin[0])
     yllcorner = int(srcwin[1])
     # keep the original spacing (four spaces here)
-    dst_fh.write("xllcorner    " + str(xllcorner) +"\n")
-    dst_fh.write("yllcorner    " + str(yllcorner) + "\n")
-    dst_fh.write("cellsize    " + str(int(skip)) + "\n")
-    dst_fh.write("NODATA_value -9999\n")
+    dst_fh.write("xllcorner    " + str(xllcorner) +"\r\n")
+    dst_fh.write("yllcorner    " + str(yllcorner) + "\r\n")
+    dst_fh.write("cellsize     " + str(int(skip)) + "\r\n")
+    dst_fh.write("NODATA_value  -9999\r\n")
 
     # loop emitting data.
 
@@ -187,7 +187,7 @@ if __name__ == '__main__':
             band_str = band_format % tuple(x_i_data)
 
             line = line +  band_str + " "
-        line = line[0:-1] + '\n'
+        line = line[0:-1] + '\r\n'
         dst_fh.write(line)
 
 dst_fh.close()

@@ -24,7 +24,7 @@ def do_upload():
 
     #Come up with a unique directory name
     while True:
-        dirname = "/tmp/tif2csv/" + ''.join(random.choices(string.ascii_letters+ string.digits, k=20))
+        dirname = ".tmp/tif2csv/" + ''.join(random.choices(string.ascii_letters+ string.digits, k=20))
         if not os.path.exists(dirname + "/"):
             os.makedirs(dirname)
             break
