@@ -33,105 +33,48 @@
 # dealings in the software.
 ###############################################################################
 
-import sys
+import logging
 
+import numpy as numeric
 from osgeo import gdal
 
-try:
-    import numpy as numeric
-except importerror:
-    import numeric
+logging.basicConfig(filename='download.log', filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
 
-# =============================================================================
-def usage():
-    print('usage: tif2csv.py [-skip factor] [-srcwin xoff yoff width height]')
-    print('                   [-band b] [-csv] srcfile [dstfile]')
-    print('')
-    sys.exit( 1 )
 
-# =============================================================================
-#
-# program mainline.
-#
+def tif2csv(filename, dstfile, xoff=0, yoff=0, width=0, height=0, srcwin=None, skip=1):
+    if filename or dstfile == "":
+        logging.error("No Filename/Destination given!")
+        return False
+    return _convert(filename, dstfile, xoff, yoff, width, height, srcwin, skip)
 
-if __name__ == '__main__':
 
-    srcwin = None
-    skip = 1
-    srcfile = None
-    dstfile = None
-    band_nums = []
+def _convert(srcfile, dstfile, xoff=0, yoff=0, width=0, height=0, srcwin=None, skip=1):
+
+    band_nums = [xoff, yoff, width, height]
     delim = ' '
-
-    gdal.AllRegister()
-    argv = gdal.GeneralCmdLineProcessor( sys.argv )
-    if argv is None:
-        sys.exit( 0 )
-
-    # parse command line arguments.
-    i = 1
-    while i < len(argv):
-        arg = argv[i]
-
-        if arg == '-srcwin':
-            srcwin = (int(argv[i+1]),int(argv[i+2]),
-                      int(argv[i+3]),int(argv[i+4]))
-            i = i + 4
-
-        elif arg == '-skip':
-            skip = int(argv[i+1])
-            i = i + 1
-
-        elif arg == '-band':
-            band_nums.append( int(argv[i+1]) )
-            i = i + 1
-
-        elif arg == '-csv':
-            delim = ','
-
-        elif arg[0] == '-':
-            usage()
-
-        elif srcfile is None:
-            srcfile = arg
-
-        elif dstfile is None:
-            dstfile = arg
-
-        else:
-            usage()
-
-        i = i + 1
-
-    if srcfile is None:
-        usage()
 
     if band_nums == []: band_nums = [1]
     # open source file.
-    srcds = gdal.Open( srcfile )
+    srcds = gdal.Open(srcfile)
     if srcds is None:
         print('could not open %s.' % srcfile)
-        sys.exit( 1 )
 
     bands = []
     for band_num in band_nums:
         band = srcds.GetRasterBand(band_num)
         if band is None:
             print('could not get band %d' % band_num)
-            sys.exit( 1 )
         bands.append(band)
 
     gt = srcds.GetGeoTransform()
 
     # collect information on all the source files.
     if srcwin is None:
-        srcwin = (0,0,srcds.RasterXSize,srcds.RasterYSize)
+        srcwin = (0, 0, srcds.RasterXSize, srcds.RasterYSize)
 
     # open the output file.
     if dstfile is not None:
-        dst_fh = open(dstfile,'wt')
-    else:
-        dst_fh = sys.stdout
+        dst_fh = open(dstfile, 'wt')
 
     dt = srcds.GetRasterBand(1).DataType
     if dt == gdal.GDT_Int32 or dt == gdal.GDT_UInt32:
@@ -141,44 +84,44 @@ if __name__ == '__main__':
 
     # setup an appropriate print format.
     if abs(gt[0]) < 180 and abs(gt[3]) < 180 \
-       and abs(srcds.RasterXSize * gt[1]) < 180 \
-       and abs(srcds.RasterYSize * gt[5]) < 180:
+            and abs(srcds.RasterXSize * gt[1]) < 180 \
+            and abs(srcds.RasterYSize * gt[5]) < 180:
         format = '%.10g' + delim + '%.10g' + delim + '%s'
     else:
         format = '%.3f' + delim + '%.3f' + delim + '%s'
 
-    #header data
+    # header data
     ncols = int(srcwin[3] / skip)
-    dst_fh.write( "ncols " + str(ncols) +"\n")
+    dst_fh.write("ncols " + str(ncols) + "\n")
     nrows = srcwin[2] / skip
     dst_fh.write("nrows " + str(nrows) + "\n")
-    #coordinates of lower-lefthand corner
+    # coordinates of lower-lefthand corner
     xllcorner = int(srcwin[0])
     yllcorner = int(srcwin[1])
     # keep the original spacing (four spaces here)
-    dst_fh.write("xllcorner    " + str(xllcorner) +"\n")
+    dst_fh.write("xllcorner    " + str(xllcorner) + "\n")
     dst_fh.write("yllcorner    " + str(yllcorner) + "\n")
     dst_fh.write("cellsize    " + str(int(skip)) + "\n")
     dst_fh.write("NODATA_value -9999\n")
 
     # loop emitting data.
 
-    for y in range(srcwin[1],srcwin[1]+srcwin[3],skip):
+    for y in range(srcwin[1], srcwin[1] + srcwin[3], skip):
 
         data = []
         for band in bands:
-            #I believe we're reading top to bottom (?)
-            band_data = band.ReadAsArray( srcwin[0], y, srcwin[2], 1 )
-            band_data = numeric.reshape( band_data, (srcwin[2],) )
+            # I believe we're reading top to bottom (?)
+            band_data = band.ReadAsArray(srcwin[0], y, srcwin[2], 1)
+            band_data = numeric.reshape(band_data, (srcwin[2],))
             data.append(band_data)
 
-        line =""
-        for x_i in range(0,srcwin[2],skip):
+        line = ""
+        for x_i in range(0, srcwin[2], skip):
 
             x = x_i + srcwin[0]
 
-            geo_x = gt[0] + (x+0.5) * gt[1] + (y+0.5) * gt[2]
-            geo_y = gt[3] + (x+0.5) * gt[4] + (y+0.5) * gt[5]
+            geo_x = gt[0] + (x + 0.5) * gt[1] + (y + 0.5) * gt[2]
+            geo_y = gt[3] + (x + 0.5) * gt[4] + (y + 0.5) * gt[5]
 
             x_i_data = []
             for i in range(len(bands)):
@@ -186,8 +129,9 @@ if __name__ == '__main__':
 
             band_str = band_format % tuple(x_i_data)
 
-            line = line +  band_str + " "
+            line = line + band_str + " "
         line = line[0:-1] + '\n'
         dst_fh.write(line)
-
-dst_fh.close()
+    logging.info("Created file at {0}".format(dstfile))
+    dst_fh.close()
+    return True
