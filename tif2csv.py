@@ -150,7 +150,7 @@ if __name__ == '__main__':
     #header data
     ncols = int(srcwin[3] / skip)
     dst_fh.write("ncols        " + str(ncols) +"\r\n")
-    nrows = srcwin[2] / skip
+    nrows = int(srcwin[2] / skip)
     dst_fh.write("nrows        " + str(nrows) + "\r\n")
     #coordinates of lower-lefthand corner
     xllcorner = int(srcwin[0])
