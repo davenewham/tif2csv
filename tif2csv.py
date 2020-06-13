@@ -41,16 +41,17 @@ from osgeo import gdal
 logging.basicConfig(filename='download.log', filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
 
 
-def tif2csv(filename, dstfile, xoff=0, yoff=0, width=0, height=0, srcwin=None, skip=1):
+def tif2csv(filename, dstfile, xoff=0, yoff=0, width=0, height=0, skip=1):
     if filename or dstfile == "":
         logging.error("No Filename/Destination given!")
         return False
-    return _convert(filename, dstfile, xoff, yoff, width, height, srcwin, skip)
+    return _convert(filename, dstfile, xoff, yoff, width, height, skip)
 
 
-def _convert(srcfile, dstfile, xoff=0, yoff=0, width=0, height=0, srcwin=None, skip=1):
+def _convert(srcfile, dstfile, xoff=0, yoff=0, width=0, height=0, skip=1):
 
-    band_nums = [xoff, yoff, width, height]
+    band_nums = []
+    srcwin=[xoff, yoff, width, height]
     delim = ' '
 
     if band_nums == []: band_nums = [1]
