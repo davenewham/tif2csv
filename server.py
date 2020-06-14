@@ -38,9 +38,10 @@ def do_upload():
         dirname = os.path.join('tmp', 'tif2csv', ''.join(random.choices(string.ascii_letters + string.digits, k=20)))
         if not os.path.exists(dirname + os.path.sep):
             os.makedirs(dirname)
+            dirname_found = True
             break
     name, ext = os.path.splitext(UrlToDownload)
-    name = name.split("/")[-1]
+    name = name.split(os.sep)[-1]
 
     # Check we have the right file extension
     if not ext == ".zip":

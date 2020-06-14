@@ -93,17 +93,17 @@ def _convert(srcfile, dstfile, xoff=0, yoff=0, width=0, height=0, skip=1):
 
     # header data
     ncols = int(srcwin[3] / skip)
-    dst_fh.write("ncols " + str(ncols) + "\n")
-    nrows = srcwin[2] / skip
-    dst_fh.write("nrows " + str(nrows) + "\n")
-    # coordinates of lower-lefthand corner
+    dst_fh.write("ncols        " + str(ncols) +"\r\n")
+    nrows = int(srcwin[2] / skip)
+    dst_fh.write("nrows        " + str(nrows) + "\r\n")
+    #coordinates of lower-lefthand corner
     xllcorner = int(srcwin[0])
     yllcorner = int(srcwin[1])
     # keep the original spacing (four spaces here)
-    dst_fh.write("xllcorner    " + str(xllcorner) + "\n")
-    dst_fh.write("yllcorner    " + str(yllcorner) + "\n")
-    dst_fh.write("cellsize    " + str(int(skip)) + "\n")
-    dst_fh.write("NODATA_value -9999\n")
+    dst_fh.write("xllcorner    " + str(xllcorner) +"\r\n")
+    dst_fh.write("yllcorner    " + str(yllcorner) + "\r\n")
+    dst_fh.write("cellsize     " + str(int(skip)) + "\r\n")
+    dst_fh.write("NODATA_value  -9999\r\n")
 
     # loop emitting data.
 
@@ -127,11 +127,9 @@ def _convert(srcfile, dstfile, xoff=0, yoff=0, width=0, height=0, skip=1):
             x_i_data = []
             for i in range(len(bands)):
                 x_i_data.append(data[i][x_i])
-
             band_str = band_format % tuple(x_i_data)
-
-            line = line + band_str + " "
-        line = line[0:-1] + '\n'
+            line = line +  band_str + " "
+        line = line[0:-1] + '\r\n'
         dst_fh.write(line)
     logging.info("Created file at {0}".format(dstfile))
     dst_fh.close()
